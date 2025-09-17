@@ -1,5 +1,6 @@
 # Contenido {.unnumbered}
 
+
 ```{=html}
 <style>
 main.content {
@@ -9,27 +10,23 @@ text-align: justify}
 
 <br>
 
-Este documento explora diferentes distribuciones de las variables aleatorias continuas más comunes; brindando sus definiciones, funciones de probabilidad, funciones de distribución, parámetros, parámetros estadísticos (media, varianza, desviación estándar), resultados importantes y ejemplos prácticos.
+Este documento explora diferentes distribuciones de las variables aleatorias discretas más comunes; brindando sus definiciones, funciones de probabilidad, funciones de distribución, parámetros, parámetros estadísticos (media, varianza, desviación estándar), resultados importantes y ejemplos prácticos.
 
-Se presentan las siguientes distribuciones continuas:
+Inicialmente se enuncia el **Teorema Central del Límite (TCL)**, que es fundamental para entender el comportamiento de las sumas y promedios de variables aleatorias en general (ya sean discretas o continuas). Luego, se presentan las siguientes distribuciones discretas:
 
--   Distribución uniforme continua
+- TCL
 
--   Distribución exponencial
+- Distribución Uniforme Discreta
 
--   Distribución gamma
+- Distribuciones Bernoulli y Binomial
 
--   Distribución beta
+- Geometrica
 
--   Distribución Weibull
+- Distribución Binomial Negativa
 
--   Distribución normal
+- Distribución Hipergeométrica
 
--   Distribucion ji-cuadrada
-
--   Distribución t
-
--   Dsitribución F
+- Distribución de Poisson
 
 Al final de cada sección se incluyen ejercicios que deben ser resueltos para reforzar el aprendizaje.
 
@@ -37,4 +34,4 @@ Al final de cada sección se incluyen ejercicios que deben ser resueltos para re
 
 Referencia:
 
--   Rincón, Luis (2014). *Introducción a la Probabilidad*. Facultad de Ciencias, UNAM.
+- Rincón, Luis (2014). *Introducción a la Probabilidad*. Facultad de Ciencias, UNAM.
