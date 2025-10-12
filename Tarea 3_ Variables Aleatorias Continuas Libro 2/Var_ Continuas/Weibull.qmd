@@ -1,0 +1,157 @@
+---
+title: "Weibull"
+author: "Dario Ortiz"
+format: html
+editor: visual
+---
+
+```{r}
+###############################################################
+#    METODOLOGÍA COMPLETA DE LA DISTRIBUCIÓN WEIBULL EN R
+#    Autor: Dario Ortiz
+#    Tema: Distribución de Weibull - Análisis completo
+###############################################################
+
+#-----------------------------------------------
+# 1. INSTALACIÓN Y CARGA DE PAQUETES
+#-----------------------------------------------
+# Instala los paquetes si no los tienes
+# install.packages(c("fitdistrplus", "MASS", "ggplot2", "dplyr", "gridExtra"))
+
+library(fitdistrplus)
+library(MASS)
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+
+#-----------------------------------------------
+# 2. GENERACIÓN O IMPORTACIÓN DE DATOS
+#-----------------------------------------------
+# Ejemplo: simulamos datos de una variable de duración o vida útil
+set.seed(123)
+n <- 200
+datos <- rweibull(n, shape = 2, scale = 5)  # forma = 2, escala = 5
+
+# También podrías cargar tus datos reales, por ejemplo:
+# datos <- read.csv("tus_datos.csv")$variable
+
+summary(datos)
+
+#-----------------------------------------------
+# 3. VISUALIZACIÓN INICIAL
+#-----------------------------------------------
+# Histograma y densidad empírica
+p1 <- ggplot(data.frame(x = datos), aes(x)) +
+  geom_histogram(aes(y = ..density..), bins = 20, fill = "skyblue", color = "black") +
+  geom_density(color = "red", size = 1.2) +
+  labs(title = "Distribución empírica de los datos", x = "Valor", y = "Densidad") +
+  theme_minimal()
+
+# Boxplot
+p2 <- ggplot(data.frame(x = datos), aes(y = x)) +
+  geom_boxplot(fill = "orange", color = "black") +
+  labs(title = "Boxplot de la variable", y = "Valor") +
+  theme_minimal()
+
+grid.arrange(p1, p2, ncol = 2)
+
+#-----------------------------------------------
+# 4. AJUSTE DE LA DISTRIBUCIÓN WEIBULL
+#-----------------------------------------------
+# Método de Máxima Verosimilitud
+ajuste <- fitdist(datos, "weibull")
+
+summary(ajuste)
+
+# Parámetros estimados
+forma_est <- ajuste$estimate["shape"]
+escala_est <- ajuste$estimate["scale"]
+
+cat("\nParámetro de forma (k):", forma_est)
+cat("\nParámetro de escala (λ):", escala_est, "\n")
+
+#-----------------------------------------------
+# 5. VISUALIZACIÓN DEL AJUSTE
+#-----------------------------------------------
+# Gráfico de densidad teórica vs empírica
+x_seq <- seq(min(datos), max(datos), length.out = 200)
+dens_teorica <- dweibull(x_seq, shape = forma_est, scale = escala_est)
+
+ggplot() +
+  geom_histogram(aes(x = datos, y = ..density..),
+                 bins = 20, fill = "lightblue", color = "black", alpha = 0.6) +
+  geom_line(aes(x = x_seq, y = dens_teorica), color = "darkred", size = 1.2) +
+  labs(title = "Ajuste de la distribución Weibull",
+       x = "Valor", y = "Densidad") +
+  theme_minimal()
+
+#-----------------------------------------------
+# 6. GRÁFICOS DE DIAGNÓSTICO
+#-----------------------------------------------
+par(mfrow = c(2, 2))
+plot(ajuste)
+par(mfrow = c(1, 1))
+
+#-----------------------------------------------
+# 7. FUNCIÓN DE SUPERVIVENCIA Y RIESGO
+#-----------------------------------------------
+# La función de supervivencia (S(x)) = exp(-(x/λ)^k)
+Sx <- function(x, k, lambda) exp(-(x/lambda)^k)
+# La función de riesgo (h(x)) = (k/λ) * (x/λ)^(k-1)
+hx <- function(x, k, lambda) (k/lambda) * (x/lambda)^(k-1)
+
+# Curvas de supervivencia y riesgo
+x_vals <- seq(0, max(datos), length.out = 200)
+supervivencia <- Sx(x_vals, forma_est, escala_est)
+riesgo <- hx(x_vals, forma_est, escala_est)
+
+p3 <- ggplot(data.frame(x_vals, supervivencia), aes(x_vals, supervivencia)) +
+  geom_line(color = "blue", size = 1.2) +
+  labs(title = "Función de supervivencia Weibull", x = "x", y = "S(x)") +
+  theme_minimal()
+
+p4 <- ggplot(data.frame(x_vals, riesgo), aes(x_vals, riesgo)) +
+  geom_line(color = "red", size = 1.2) +
+  labs(title = "Función de riesgo Weibull", x = "x", y = "h(x)") +
+  theme_minimal()
+
+grid.arrange(p3, p4, ncol = 2)
+
+#-----------------------------------------------
+# 8. PRUEBAS DE BONDAD DE AJUSTE
+#-----------------------------------------------
+# Pruebas estadísticas
+ks <- ks.test(datos, "pweibull", shape = forma_est, scale = escala_est)
+ad <- gofstat(ajuste)
+
+cat("\n--- Prueba KS ---\n")
+print(ks)
+cat("\n--- Estadísticos de bondad de ajuste ---\n")
+print(ad)
+
+#-----------------------------------------------
+# 9. INTERPRETACIÓN ECONÓMICA (ejemplo)
+#-----------------------------------------------
+# En análisis económico o de datos financieros, la Weibull puede modelar:
+# - Duración de contratos o tiempo hasta un evento (default, quiebra, etc.)
+# - Tiempos de espera hasta que ocurre una recesión o cambio estructural
+# - Vida útil de maquinaria o activos de una empresa
+
+cat("\nInterpretación:\n")
+if (forma_est > 1) {
+  cat("El riesgo aumenta con el tiempo: eventos más probables conforme pasa el tiempo (vida útil limitada).\n")
+} else if (forma_est == 1) {
+  cat("Riesgo constante: equivalente a una distribución exponencial.\n")
+} else {
+  cat("El riesgo disminuye con el tiempo: más probable al inicio, luego se estabiliza.\n")
+}
+
+#-----------------------------------------------
+# 10. CONCLUSIÓN
+#-----------------------------------------------
+cat("\nConclusión:\n")
+cat("La distribución Weibull ajusta bien los datos simulados. Los parámetros estimados indican\n",
+    "una tendencia de riesgo creciente, típica de variables de duración o vida útil.\n")
+
+```
+
